@@ -1,3 +1,4 @@
+const { response } = require("express");
 const { thought, user } = require("../models");
 const { populate } = require("../models/thought");
 
@@ -39,7 +40,7 @@ module.exports = {
           ? res.status(404).json({
               message: "Thought made, but no user found with this id.",
             })
-          : res.json("Thought posted and user found.")
+          : res.json("User found and thought posted.")
       )
       .catch((err) => {
         console.log(err);
@@ -77,6 +78,7 @@ module.exports = {
 
   //POST to create a reaction stored for single thought's reaction
   addReaction(req, res) {
+    console.log(req);
     thought
       .findOneAndUpdate(
         { _id: req.params.thoughtId },
@@ -92,20 +94,23 @@ module.exports = {
   },
 
   //DELETE
-  deleteReaction({ params }, res) {
+  deleteReaction(req, res) {
+    console.log(req);
     thought
       .findOneAndUpdate(
-        { _id: params.thoughtId },
-        { $pull: { reactions: params.reactionId } },
+        { _id: req.params._id },
+        { $pull: { reactions: req.params.reactionId } },
         { new: true }
       )
-      .select("-__v")
-      .populate("reactions")
-      .then((thought) =>
-        !thought
-          ? res.status(404).json({ message: "No thought with that id." })
-          : res.json({ message: "Reaction deleted!" })
-      )
+      // .select("-__v")
+      // .populate("reactions")
+      .then((thought) => {
+        console.log(thought);
+        if (!thought)
+          res.status(404).json({ message: "No thought with that id." });
+        res.json({ message: "Reaction deleted!" });
+      })
+      .then((result) => res.status(200).json(result))
       .catch((err) => res.status(500).json(err));
   },
 };

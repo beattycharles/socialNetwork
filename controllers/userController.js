@@ -57,7 +57,7 @@ module.exports = {
           ? res.status(404).json({ message: "No user with that id." })
           : thought.deleteMany({ _id: { $in: user.thoughts } })
       )
-      .then(() => res.json({ message: "User thoughts deleted!" }))
+      .then(() => res.json({ message: "User and thoughts deleted!" }))
       .catch((err) => res.status(500).json(err));
   },
 
@@ -89,11 +89,9 @@ module.exports = {
       .populate("friends")
       .then((user) =>
         !user
-          ? res
-              .status(404)
-              .json({
-                message: "No user to delete friend from found with that id.",
-              })
+          ? res.status(404).json({
+              message: "No user to delete friend from found with that id.",
+            })
           : res.json(user)
       )
       .catch((err) => res.status(500).json(err));
